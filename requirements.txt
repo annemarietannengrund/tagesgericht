@@ -1,0 +1,5 @@
+coverage
+python-twitter
+sphinx
+sphinx-autodoc-typehints
+simple-term-menu

@@ -1,0 +1,16 @@
+div.body {
+    min-width: 450px;
+    max-width: 1800px;
+}
+
+div.bodywrapper {
+    margin: 0 0 0 350px;
+}
+
+table.align-default {
+    min-width: 600px;
+}
+
+div.sphinxsidebar {
+    width: 350px;
+}

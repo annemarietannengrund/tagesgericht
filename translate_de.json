@@ -1,0 +1,22 @@
+{
+  "calendarweek": "Kalenderwoche",
+  "status": "Status",
+  "couldnt create file, check permissions": "konnte datei nicht erstellen, bitte berechtigungen prüfen",
+  "message empty": "Nachricht ist Leer",
+  "message too long": "Nachricht ist zu Lang",
+  "Future & Active calendar weeks": "Aktive & zukünftige Kalenderwochen",
+  "Past calendar weeks": "Vergangene Kalenderwochen",
+  "Error": "Fehler",
+  "Info": "Information",
+  "Planned message can be sent": "geplante nachricht kann versendet werden",
+  "Planned message is empty": "geplante nachricht ist leer",
+  "Planned message cant be sent": "geplante nachricht kann nicht versendet werden",
+  "Legend": "Legende",
+  "Message was sent": "nachricht wurde versendet",
+  "Message was not sent": "nachricht wurde nicht versendet",
+  "sent at": "Gesendet am",
+  "exit program": "Programm beenden",
+  "create report": "Report erstellen",
+  "stopped at": "Gestoppt am",
+  "unsent": "Unversendet"
+}
