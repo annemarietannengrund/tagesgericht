@@ -359,7 +359,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         get_now_datetime.assert_has_calls([call()])
         self.assertEqual(today, cwm.today)
@@ -373,7 +374,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.get_now_datetime()
         now = datetime.now()
@@ -392,7 +394,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.year, cwm.month, cwm.day = 2021, 6, 13
         cwm.init_manager()
@@ -421,7 +424,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.year, cwm.month, cwm.day = 2021, 6, 13
         cwm.init_manager()
@@ -446,7 +450,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.next_weekday(d=today, weekday=0)
         self.assertEqual(next_monday, result)
@@ -462,7 +467,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.add_week(today=today)
         self.assertEqual(next_week, result)
@@ -480,7 +486,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         self.assertTrue(cwm.has_active_days_left_this_cw(active_days=active_days, day_num=current_day_num))
         active_days = [0, 1, 2, 3, 6]
@@ -502,7 +509,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.create_file_structure(data_dir=self.data_dir, year=self.year, week=self.week)
         join.assert_has_calls([
@@ -529,7 +537,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.create_file_structure(data_dir=self.data_dir, year=self.year, week=self.week)
         join.assert_has_calls([
@@ -566,7 +575,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.create_templates(active_days=self.active_days, folderpath=self.data_dir)
         join.assert_has_calls([
@@ -614,7 +624,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.create_templates(active_days=self.active_days, folderpath=self.data_dir)
         lprint.assert_has_calls([
@@ -660,7 +671,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.parse_year_dir(path=self.data_dir)
         parse_week_dir.assert_called_once_with(path='unittest/2021', year_dict={}, year='2021')
@@ -676,7 +688,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.get_new_calendarweek_obj(year="2021", week="42")
         self.assertEqual(Calendarweek(year="2021", week="42"), result)
@@ -695,14 +708,19 @@ class TestCalendarweekManager(TestCase):
         join.return_value = '/'.join([self.data_dir, "2021", "42"])
         cw_obj0 = Mock()
         cw_obj0.first_day_of_week = date(2021, 12, 13)
-
+        day_mock = Mock()
+        day_mock.specialday = ''
+        cw_obj0.items = {
+            0: day_mock
+        }
         get_new_calendarweek_obj.side_effect = [cw_obj0, ]
 
         cwm = TagesgerichtManager(
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={'13.12':'unittestday'}
         )
         result = cwm.parse_week_dir(year="2021", year_dict={}, path=self.data_dir)
 
@@ -732,7 +750,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         ci0 = Mock()
         ci0.message_length = 13
@@ -740,7 +759,8 @@ class TestCalendarweekManager(TestCase):
         ci0.filepath = 'unittest/unit.txt'
         ci0.message_icon = '✅'
         ci0.get_error_text.return_value = ''
-        ci0.has_been_sent.return_value = False
+        ci0.has_been_sent.return_value = "Message has ben sent at 2021-06-13 12:30"
+        ci0.specialday = ''
         ci1 = Mock()
         ci1.message_length = 0
         ci1.message_length_exceeded = False
@@ -748,6 +768,7 @@ class TestCalendarweekManager(TestCase):
         ci1.message_icon = '❎'
         ci1.get_error_text.return_value = 'message empty'
         ci1.has_been_sent.return_value = False
+        ci1.specialday = ''
         ci2 = Mock()
         ci2.message_length = 300
         ci2.message_length_exceeded = True
@@ -755,6 +776,7 @@ class TestCalendarweekManager(TestCase):
         ci2.message_icon = '❌️'
         ci2.get_error_text.return_value = 'message too long'
         ci2.has_been_sent.return_value = False
+        ci2.specialday = 'Unittest tag'
         cw_obj = Mock()
         cw_obj.week = '42'
         cw_obj.first_day_of_week = date(2021, 12, 13)
@@ -774,7 +796,7 @@ class TestCalendarweekManager(TestCase):
 
         lprint.assert_has_calls([
             call('============================================\ncalendarweek 42 13.12.2021 - 19.12.2021 ❎️'),
-            call('unittest/unit.txt', '✅', '', False),
+            call('unittest/unit.txt', '✅', '', 'Message has ben sent at 2021-06-13 12:30'),
             call('unittest/unit.txt', '❎', '', 'message empty'),
             call('unittest/unit.txt', '❌️', '', 'message too long')
         ])
@@ -786,7 +808,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         line = cwm.get_rst_line_for_str(string='123456789', linetype='*')
         self.assertEqual('**********', line)
@@ -798,7 +821,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         line = cwm.get_formatted_rst_header(message='123456789', linetype='*', doubled=False)
         self.assertEqual('123456789\n**********\n\n', line)
@@ -812,7 +836,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         line = cwm.get_formatted_rst_quote(message='123456789', quote='quote')
         self.assertEqual(':quote:\n\n    123456789\n\n', line)
@@ -824,13 +849,17 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         ci0 = Mock()
         ci0.message_length = 13
         ci0.message_length_exceeded = False
         ci0.filepath = 'unittest/unit.txt'
         ci0.message = 'message test unittest 1'
+        ci0.specialday = ''
+        ci0.has_been_sent.return_value = "Message has ben sent at 2021-06-13 12:30"
+        ci0.has_been_stopped.return_value = "Message has ben stopped at 2021-06-13 13:30"
         ci0.message_icon = '✅'
         ci0.item_date = date(2021, 12, 13)
         ci1 = Mock()
@@ -838,6 +867,9 @@ class TestCalendarweekManager(TestCase):
         ci1.message_length_exceeded = False
         ci1.filepath = 'unittest/unit.txt'
         ci1.message = ''
+        ci1.specialday = ''
+        ci1.has_been_sent.return_value = False
+        ci1.has_been_stopped.return_value = False
         ci1.message_icon = '❎️'
         ci1.item_date = date(2021, 12, 14)
         ci2 = Mock()
@@ -845,6 +877,9 @@ class TestCalendarweekManager(TestCase):
         ci2.message_length_exceeded = True
         ci2.filepath = 'unittest/unit.txt'
         ci2.message = 'message test unittest 3'
+        ci2.specialday = 'Unittest tag'
+        ci2.has_been_sent.return_value = False
+        ci2.has_been_stopped.return_value = False
         ci2.message_icon = '❌️'
         ci2.item_date = date(2021, 12, 15)
         cw_obj = Mock()
@@ -859,9 +894,12 @@ class TestCalendarweekManager(TestCase):
         }
         line = cwm.return_week_as_rst_string(week=cw_obj)
         self.assertEqual('===================\ncalendarweek 49 ❎️\n===================\n\nMontag, 13.12.2021 ✅' +
-                         '\n^^^^^^^^^^^^^^^^^^^^^\n\n::\n\n    message test unittest 1\n\n' +
+                         '\n^^^^^^^^^^^^^^^^^^^^^\n\n'+':Info:\n\n    Message has ben sent at 2021-06-13 12:30\n\n'+
+                         ':Info:\n\n    Message has ben stopped at 2021-06-13 13:30\n\n' +
+                         '::\n\n    message test unittest 1\n\n' +
                          'Dienstag, 14.12.2021 ❎️\n^^^^^^^^^^^^^^^^^^^^^^^^\n\n:Info:\n\n    message empty\n\n' +
-                         'Mittwoch, 15.12.2021 ❌️\n^^^^^^^^^^^^^^^^^^^^^^^^\n\n:Error:\n\n    message too long\n\n' +
+                         'Mittwoch, 15.12.2021 ❌️\n^^^^^^^^^^^^^^^^^^^^^^^^\n\n'+':Info:\n\n    Unittest tag\n\n' +
+                         ':Error:\n\n    message too long\n\n' +
                          '::\n\n    message test unittest 3\n\n', line)
         lread_file.assert_called_once_with(path='translate_de.json', json=True)
 
@@ -875,7 +913,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         line = cwm.get_report_legend(header='unittest', history=False)
         get_formatted_rst_header.assert_called_once_with(
@@ -902,7 +941,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         line = cwm.get_report_legend(header='unittest', history=True)
         get_formatted_rst_header.assert_called_once_with(
@@ -1003,7 +1043,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.report_build_folder = 'unittest'
         cwm.data = {'2021': {'49': cw_obj, '50': cw_obj1}}
@@ -1054,7 +1095,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
 
         cwm.year, cwm.month, cwm.day = 2021, 12, 13
@@ -1086,7 +1128,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.send_message_for_today()
         ljoin.assert_called_once_with('unittest', '2021', '42', 'log.json')
@@ -1117,7 +1160,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1149,7 +1193,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1172,7 +1217,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1189,7 +1235,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.year = 2021
         cwm.current_week = 42
@@ -1214,7 +1261,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.year = 2021
         cwm.current_week = 42
@@ -1242,7 +1290,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1263,7 +1312,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1284,7 +1334,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1305,7 +1356,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1325,7 +1377,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1345,7 +1398,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1365,7 +1419,8 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
@@ -1377,13 +1432,16 @@ class TestCalendarweekManager(TestCase):
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
-    def test_send_sold_out_message(self, write_week_logfile, get_current_week_obj, init_manager, lread_file):
+    @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
+    def test_send_sold_out_message(self, get_today_from_calendarweek, write_week_logfile, get_current_week_obj, init_manager, lread_file):
         current_week_obj_mock = Mock()
         mock_day = Mock()
-
+        mock_day.has_been_sent.return_value = True
+        mock_day.has_been_stopped.return_value = False
         current_week_obj_mock.items = {
             0: mock_day
         }
+        get_today_from_calendarweek.return_value = mock_day
         current_week_obj_mock.has_been_stopped.return_value = True
         current_week_obj_mock.week = "42"
         get_current_week_obj.return_value = current_week_obj_mock
@@ -1392,9 +1450,11 @@ class TestCalendarweekManager(TestCase):
             weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de"
+            language="de",
+            specialdays={}
         )
         cwm.day_num = 0
+        cwm.current_week = "42"
         result = cwm.send_sold_out_message()
         write_week_logfile.assert_called_once_with(
             week=current_week_obj_mock.week,
@@ -1402,6 +1462,79 @@ class TestCalendarweekManager(TestCase):
         )
         mock_day.add_log.assert_called_once_with(message_sent=True, message_stopped=True, translate={})
         get_current_week_obj.assert_called_once_with()
+        get_today_from_calendarweek.assert_called_once_with()
+        init_manager.assert_called_once_with()
+        lread_file.assert_called_once_with(path='translate_de.json', json=True)
+        self.assertTrue(result)
+
+    @patch("src.Tagesgericht.read_file", return_value={})
+    @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
+    @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
+    @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
+    @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
+    def test_send_sold_out_message_not_sent_yet(self, get_today_from_calendarweek, write_week_logfile, get_current_week_obj, init_manager, lread_file):
+        current_week_obj_mock = Mock()
+        mock_day = Mock()
+        mock_day.has_been_sent.return_value = False
+        mock_day.has_been_stopped.return_value = False
+        current_week_obj_mock.items = {
+            0: mock_day
+        }
+        get_today_from_calendarweek.return_value = mock_day
+        current_week_obj_mock.has_been_stopped.return_value = True
+        current_week_obj_mock.week = "42"
+        get_current_week_obj.return_value = current_week_obj_mock
+
+        cwm = TagesgerichtManager(
+            weekday_map=self.weekday_map,
+            active_days=self.active_days,
+            data_dir=self.data_dir,
+            language="de",
+            specialdays={}
+        )
+        cwm.day_num = 0
+        cwm.current_week = "42"
+        result = cwm.send_sold_out_message()
+        write_week_logfile.assert_not_called()
+        mock_day.add_log.assert_not_called()
+        get_current_week_obj.assert_not_called()
+        get_today_from_calendarweek.assert_called_once_with()
+        init_manager.assert_called_once_with()
+        lread_file.assert_called_once_with(path='translate_de.json', json=True)
+        self.assertFalse(result)
+
+    @patch("src.Tagesgericht.read_file", return_value={})
+    @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
+    @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
+    @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
+    @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
+    def test_send_sold_out_message_already_sent(self, get_today_from_calendarweek, write_week_logfile, get_current_week_obj, init_manager, lread_file):
+        current_week_obj_mock = Mock()
+        mock_day = Mock()
+        mock_day.has_been_sent.return_value = True
+        mock_day.has_been_stopped.return_value = True
+        current_week_obj_mock.items = {
+            0: mock_day
+        }
+        get_today_from_calendarweek.return_value = mock_day
+        current_week_obj_mock.has_been_stopped.return_value = True
+        current_week_obj_mock.week = "42"
+        get_current_week_obj.return_value = current_week_obj_mock
+
+        cwm = TagesgerichtManager(
+            weekday_map=self.weekday_map,
+            active_days=self.active_days,
+            data_dir=self.data_dir,
+            language="de",
+            specialdays={}
+        )
+        cwm.day_num = 0
+        cwm.current_week = "42"
+        result = cwm.send_sold_out_message()
+        write_week_logfile.assert_not_called()
+        mock_day.add_log.assert_not_called()
+        get_current_week_obj.assert_not_called()
+        get_today_from_calendarweek.assert_called_once_with()
         init_manager.assert_called_once_with()
         lread_file.assert_called_once_with(path='translate_de.json', json=True)
         self.assertFalse(result)

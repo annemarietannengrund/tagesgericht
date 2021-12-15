@@ -51,10 +51,12 @@ class Calendaritem:
     message_sendable: bool
     message_icon: str
     logentrys: list
+    specialday: str
 
     def __init__(self, filepath: str, item_date: date):
         self.filepath = filepath
         self.item_date = item_date
+        self.specialday = ""
         self.logentrys = []
 
     @staticmethod
@@ -199,16 +201,19 @@ class TagesgerichtManager:
     day: int
     data_dir: str
     data: dict
+    specialdays: dict
     today: date
 
     def __init__(self,
                  weekday_map: dict,
                  active_days: List[int],
                  data_dir: str,
-                 language: str
+                 language: str,
+                 specialdays: dict
                  ):
         self.weekday_map = weekday_map
         self.active_days = active_days
+        self.specialdays = specialdays
         self.data_dir = data_dir
         self.year, self.month, self.day = self.get_now_datetime()
         self.today = date(self.year, self.month, self.day)
@@ -237,11 +242,16 @@ class TagesgerichtManager:
         return current_day_obj and current_day_obj.has_been_sent(
             translate=self.translate) and not current_day_obj.has_been_stopped(translate=self.translate)
 
-    def send_sold_out_message(self):
+    def send_sold_out_message(self)->bool:
         self.init_manager()
-        current_week_obj = self.get_current_week_obj()
-        current_week_obj.items[self.day_num].add_log(message_sent=True, message_stopped=True, translate=self.translate)
-        self.write_week_logfile(week=current_week_obj.week, items=current_week_obj.items)
+        current_day_obj = self.get_today_from_calendarweek()
+        was_sent = current_day_obj.has_been_sent(translate=self.translate)
+        was_stopped = current_day_obj.has_been_stopped(translate=self.translate)
+        if was_sent and not was_stopped:
+            current_week_obj = self.get_current_week_obj()
+            current_week_obj.items[self.day_num].add_log(message_sent=True, message_stopped=True, translate=self.translate)
+            self.write_week_logfile(week=self.current_week, items=current_week_obj.items)
+            return True
 
     def send_message_for_today(self):
         self.init_manager()
@@ -384,6 +394,11 @@ class TagesgerichtManager:
                         day_num=fday.weekday(),
                         item_date=fday
                     )
+                    specialday = self.specialdays.get(fday.strftime('%d.%m'), False)
+                    if specialday:
+                        item = cw_obj.items[file_weekday]
+                        item.specialday = specialday
+                        cw_obj.items[file_weekday] = item
 
                     day_logfile = day_logfiles.get(str(file_weekday))
                     if day_logfile:
@@ -403,11 +418,20 @@ class TagesgerichtManager:
                     cw_obj.last_day_of_week.strftime("%d.%m.%Y"),
                     cw_obj.week_icon
                 ))
-                for day_num, day_obj in OrderedDict(sorted(cw_obj.items.items())).items():
-                    # wenn gesendet, zeige sendedatum
-                    msgtext = day_obj.has_been_sent(translate=self.translate)
-                    if not msgtext:
-                        msgtext = self.translate.get('unsent', 'unsent')
+
+                ordered_week_items = OrderedDict(sorted(cw_obj.items.items())).items()
+                for day_num, day_obj in ordered_week_items:
+                    msgtext = ""
+                    if day_obj.specialday:
+                        msgtext += self.get_formatted_rst_quote(
+                            quote=self.translate.get('Info', "Info"),
+                            message=day_obj.specialday
+                        )
+                    been_sent = day_obj.has_been_sent(translate=self.translate)
+                    if not been_sent:
+                        msgtext += self.translate.get('unsent', 'unsent')
+                    else:
+                        msgtext += been_sent
                     print(
                         day_obj.filepath,
                         day_obj.message_icon,
@@ -448,6 +472,9 @@ class TagesgerichtManager:
             day_header = '{}, {} {}'.format(self.weekday_map.get(day_num), day_data.item_date.strftime("%d.%m.%Y"),
                                             day_data.message_icon)
             ret += self.get_formatted_rst_header(message=day_header, doubled=False, linetype='^')
+            if day_data.specialday:
+                ret += self.get_formatted_rst_quote(quote=self.translate.get('Info', "Info"),
+                                                    message=day_data.specialday)
             if not day_data.message_length:
                 ret += self.get_formatted_rst_quote(quote=self.translate.get('Info', 'Info'),
                                                     message=self.translate.get('message empty', 'message empty'))
@@ -505,5 +532,5 @@ class TagesgerichtManager:
                     history += self.return_week_as_rst_string(week=cw_obj)
                     continue
                 planned_status += self.return_week_as_rst_string(week=cw_obj)
-        write_file(path=str(join(self.report_build_folder, 'planned_status.rst')), data=planned_status, json=False)
-        write_file(path=str(join(self.report_build_folder, 'history.rst')), data=history, json=False)
+        write_file(path="/".join([self.report_build_folder, 'planned_status.rst']), data=planned_status, json=False)
+        write_file(path="/".join([self.report_build_folder, 'history.rst']), data=history, json=False)

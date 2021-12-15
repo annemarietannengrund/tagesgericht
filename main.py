@@ -44,7 +44,8 @@ def main(lconfig: dict):
         weekday_map=config.get('weekday_map'),
         active_days=config.get('active_days'),
         data_dir=config.get('data_dir'),
-        language="de"
+        language="de",
+        specialdays=config.get('specialdays'),
     )
 
     while True:
@@ -67,6 +68,7 @@ if __name__ == '__main__':
             "ACCESS_TOKEN": credentials.get('ACCESS_TOKEN', ''),
             "ACCESS_TOKEN_SECRET": credentials.get('ACCESS_TOKEN_SECRET', ''),
         },
+        "specialdays": read_file(path="specialdays.json", json=True),
         "data_dir": "Data/",
         "active_days": [0, 1, 2, 3, 4],
         'weekday_map': {
