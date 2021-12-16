@@ -20,15 +20,17 @@ def twitter_call(message: str, credentials: dict):
     access_key = credentials.get("ACCESS_TOKEN", "")
     access_secret = credentials.get("ACCESS_TOKEN_SECRET", "")
     encoding = credentials.get('ENCODING', "utf-8")
+    username = ""
+    statustext = ""
     api = Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
               access_token_key=access_key, access_token_secret=access_secret,
               input_encoding=encoding, request_headers=None)
     try:
         status = api.PostUpdate(message)
+        print("{0} just posted: {1}".format(status.user.name, status.text))
     except UnicodeDecodeError:
         print("whoopsie")
         exit(2)
-    print("{0} just posted: {1}".format(status.user.name, status.text))
 
 
 def create_folder(dir_path: str) -> None:

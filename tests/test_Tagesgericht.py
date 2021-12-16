@@ -3,8 +3,40 @@ from unittest import TestCase
 from unittest.mock import patch, call, mock_open, Mock
 
 from src.Tagesgericht import Calendaritem, Calendarweek, TagesgerichtManager
-from src.Tagesgericht import create_folder, remove_folder, write_file, read_file
+from src.Tagesgericht import create_folder, remove_folder, write_file, read_file, twitter_call
 
+class TestPostTwitter(TestCase):
+    @patch("src.Tagesgericht.Api")
+    @patch("src.Tagesgericht.print")
+    def test_twitter_call(self, lprint, Api):
+        PostUpdate = Mock()
+        item = Mock()
+        item.user.name = "unittestuser"
+        item.text = "unittesttext"
+        PostUpdate.PostUpdate.return_value = item
+        Api.return_value = PostUpdate
+        twitter_call(message='unittest', credentials={})
+        Api.assert_called_once_with(consumer_key='', consumer_secret='', access_token_key='', access_token_secret='', input_encoding='utf-8', request_headers=None)
+        PostUpdate.assert_has_calls([
+            call.PostUpdate('unittest')
+        ])
+        lprint.assert_called_once_with('unittestuser just posted: unittesttext')
+
+    @patch("src.Tagesgericht.Api")
+    @patch("src.Tagesgericht.print")
+    @patch("src.Tagesgericht.exit")
+    def test_twitter_call_exception(self, lexit, lprint, Api):
+        PostUpdate = Mock()
+        PostUpdate.PostUpdate.side_effect = UnicodeDecodeError('',b'',0,1,'')
+        Api.return_value = PostUpdate
+        twitter_call(message='unittest', credentials={})
+        Api.assert_called_once_with(consumer_key='', consumer_secret='', access_token_key='', access_token_secret='', input_encoding='utf-8', request_headers=None)
+        PostUpdate.assert_has_calls([
+            call.PostUpdate('unittest')
+        ])
+        lprint.assert_called_once_with("whoopsie")
+        lexit.assert_called_once_with(2)
+        self.assertRaises(UnicodeDecodeError)
 
 class TestReadWriteDeleteFiles(TestCase):
 
