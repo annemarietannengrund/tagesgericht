@@ -1,6 +1,6 @@
 from sys import argv
 
-from src.Tagesgericht import TagesgerichtManager, read_file
+from src.Tagesgericht import TagesgerichtManager, read_file, twitter_call
 
 
 def bat_handler(larg: str, lconfig: dict):

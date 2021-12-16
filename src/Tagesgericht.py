@@ -8,6 +8,28 @@ from shutil import rmtree
 from typing import List, Union
 from unicodedata import normalize
 
+from twitter import Api
+
+
+def twitter_call(message: str, credentials: dict):
+    """does a twitter API call
+    taken from official twitter python github page
+    https://github.com/bear/python-twitter/blob/master/examples/tweet.py"""
+    consumer_key = credentials.get("API_KEY", "")
+    consumer_secret = credentials.get("API_KEY_SECRET", "")
+    access_key = credentials.get("ACCESS_TOKEN", "")
+    access_secret = credentials.get("ACCESS_TOKEN_SECRET", "")
+    encoding = credentials.get('ENCODING', "utf-8")
+    api = Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
+              access_token_key=access_key, access_token_secret=access_secret,
+              input_encoding=encoding, request_headers=None)
+    try:
+        status = api.PostUpdate(message)
+    except UnicodeDecodeError:
+        print("whoopsie")
+        exit(2)
+    print("{0} just posted: {1}".format(status.user.name, status.text))
+
 
 def create_folder(dir_path: str) -> None:
     if not isdir(dir_path):
@@ -21,12 +43,13 @@ def remove_folder(dir_path: str) -> None:
         print("Error: %s : %s" % (dir_path, e.strerror))
 
 
-def write_file(path: str, json: bool, data: Union[dict, str]) -> None:
+def write_file(path: str, json: bool, data: Union[str, dict]) -> None:
     """writes file content, if json is True content is json encoded"""
     with open(path, mode="w", encoding="utf-8", errors="strict") as file:
         if json:
             file.write(dumps(data))
-        file.write(data)
+        else:
+            file.write(data)
 
 
 def read_file(path: str, json: bool) -> Union[str, dict]:
@@ -260,6 +283,7 @@ class TagesgerichtManager:
         was_sent = current_day_obj.has_been_sent(translate=self.translate)
         was_stopped = current_day_obj.has_been_stopped(translate=self.translate)
         if was_sent and not was_stopped:
+            twitter_call(message=self.translate.get("Meal of the day is sold-out!", "Meal of the day is sold-out!"), credentials=self.credentials)
             current_week_obj = self.get_current_week_obj()
             current_week_obj.items[self.day_num].add_log(message_sent=True, message_stopped=True,
                                                          translate=self.translate)
@@ -278,6 +302,7 @@ class TagesgerichtManager:
 
         current_week_obj = self.get_current_week_obj()
         if current_day_obj.message_sendable:
+            twitter_call(message=current_day_obj.message, credentials=self.credentials)
             current_week_obj.items[self.day_num].add_log(
                 message_sent=True,
                 message_stopped=False,

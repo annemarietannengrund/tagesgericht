@@ -110,7 +110,7 @@ language = "de"
 in the `specialdays.json` you can define a day and a month number, that is mapped to a message. this message will be
 displayed on the day in the html report. this feature allows to be reminded for special day from2 up to 3 weeks ahead
 
-# Installation & Setup
+## Installation & Setup
 
 install [python 3.7+](https://www.python.org/downloads/), make sure to check "add python 3.XX to Path".
 
@@ -120,7 +120,7 @@ then start the following bat file
 
 setup.bat - prepare the virtual environment for this software
 
-# run on windows
+### run on windows
 
 use the batchfiles.
 
@@ -134,7 +134,7 @@ stop_tagesgericht_tweet.bat - sends a sold-out message
 
 check_code_coverage - creates a html code coverage ceport
 
-# run on linux/mac
+### run on linux/mac
 
 ```
 coverage run -m unittest discover -s ./tests && coverage html
@@ -156,3 +156,7 @@ python main.py create_report
 python main.py send_tweet
 python main.py stoptweet
 ```
+
+## tips & tricks
+- since the storage is based on text files in folders, its easy to prepare things on one device and import them on another.
+- the bat files can just be linked to a location, for easy access. (rightclick -> send to desktop)

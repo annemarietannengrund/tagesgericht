@@ -56,10 +56,9 @@ class TestReadWriteDeleteFiles(TestCase):
         """checks that write_file is creting a file with json content if json flag is set to True"""
         write_file(path="test.json", json=True, data={"unittest": "unittest"})
         lopen.assert_has_calls([
-            call("test.json", mode="w", encoding="utf-8", errors="strict"),
+            call('test.json', mode='w', encoding='utf-8', errors='strict'),
             call().__enter__(),
             call().write('{"unittest": "unittest"}'),
-            call().write({"unittest": "unittest"}),
             call().__exit__(None, None, None)
         ])
 
@@ -1119,12 +1118,14 @@ class TestTagesgerichtManager(TestCase):
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join", return_value="unittest/2021/6/log.json")
-    def test_send_message_for_today(self, ljoin, lwrite_file, get_current_week_obj, init_manager,
+    @patch("src.Tagesgericht.twitter_call")
+    def test_send_message_for_today(self, twitter_call, ljoin, lwrite_file, get_current_week_obj, init_manager,
                                     get_today_from_calendarweek):
         today_obj = get_today_from_calendarweek.return_value
         today_obj.has_been_sent.return_value = False
         today_obj.message_sendable.return_value = True
         today_obj.week = "42"
+        today_obj.message = "The nswer is 42"
         get_today_from_calendarweek.return_value = today_obj
         week_obj = get_current_week_obj.return_value
 
@@ -1143,6 +1144,7 @@ class TestTagesgerichtManager(TestCase):
         lwrite_file.assert_called_once_with(path="unittest/2021/6/log.json", json=True, data={})
         init_manager.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
+        twitter_call.assert_called_once_with(message='The nswer is 42', credentials={})
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
@@ -1417,7 +1419,8 @@ class TestTagesgerichtManager(TestCase):
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_send_sold_out_message(self, get_today_from_calendarweek, write_week_logfile, get_current_week_obj,
+    @patch("src.Tagesgericht.twitter_call")
+    def test_send_sold_out_message(self, twitter_call, get_today_from_calendarweek, write_week_logfile, get_current_week_obj,
                                    init_manager):
         current_week_obj_mock = Mock()
         mock_day = Mock()
@@ -1449,6 +1452,7 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
         init_manager.assert_called_once_with()
+        twitter_call.assert_called_once_with(message='Meal of the day is sold-out!', credentials={})
         self.assertTrue(result)
 
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
