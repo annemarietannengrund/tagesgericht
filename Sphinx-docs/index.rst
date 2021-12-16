@@ -10,7 +10,7 @@ Reports
 .. toctree::
    :maxdepth: 2
 
-   reportz/planned_status
+   report/planned_status
 
 =======
 History
@@ -19,7 +19,7 @@ History
 .. toctree::
    :maxdepth: 2
 
-   reportz/history
+   report/history
 
 =====================
 Requirements & Config

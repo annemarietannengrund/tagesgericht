@@ -11,12 +11,23 @@
   "Planned message can be sent": "geplante nachricht kann versendet werden",
   "Planned message is empty": "geplante nachricht ist leer",
   "Planned message cant be sent": "geplante nachricht kann nicht versendet werden",
-  "Legend": "Legende",
+  "Legend": "Erklärung",
   "Message was sent": "nachricht wurde versendet",
   "Message was not sent": "nachricht wurde nicht versendet",
   "sent at": "Gesendet am",
   "exit program": "Programm beenden",
   "create report": "Report erstellen",
   "stopped at": "Gestoppt am",
-  "unsent": "Unversendet"
+  "unsent": "Unversendet",
+  "Tweet was not sent, please see report for reason": "Nachricht wurde nicht gesendet, bitte report einsehen für grund",
+  "you can close this window now": "Sie können das Fenster nun schließen!",
+  "weekday_map": {
+    "0": "Montag",
+    "1": "Dienstag",
+    "2": "Mittwoch",
+    "3": "Donnerstag",
+    "4": "Freitag",
+    "5": "Samstag",
+    "6": "Sonntag"
+  }
 }

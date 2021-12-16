@@ -1,0 +1,33 @@
+{
+  "calendarweek": "Tydzień kalendarzowy",
+  "status": "Status",
+  "couldnt create file, check permissions": "nie można utworzyć pliku, sprawdź uprawnienia",
+  "message empty": "Wiadomość jest pusta",
+  "message too long": "Wiadomość jest za długa",
+  "Future & Active calendar weeks": "Aktywne i przyszłe tygodnie kalendarzowe",
+  "Past calendar weeks": "Minione tygodnie kalendarzowe",
+  "Error": "błąd",
+  "Info": "Informacja",
+  "Planned message can be sent": "zaplanowana wiadomość może zostać wysłana",
+  "Planned message is empty": "zaplanowana wiadomość jest pusta",
+  "Planned message cant be sent": "Nie można wysłać zaplanowanej wiadomości",
+  "Legend": "Wyjaśnienie",
+  "Message was sent": "wiadomość została wysłana",
+  "Message was not sent": "wiadomość nie została wysłana",
+  "sent at": "Wysłany dnia",
+  "exit program": "wyjdź z programu",
+  "create report": "Tworzyć raport",
+  "stopped at": "Zatrzymany",
+  "unsent": "Niewysłane",
+  "Tweet was not sent, please see report for reason": "Wiadomość nie została wysłana, proszę zapoznać się z raportem z powodu",
+  "you can close this window now": "Możesz teraz zamknąć okno!",
+  "weekday_map": {
+    "0": "Poniedziałek",
+    "1": "wtorek",
+    "2": "Środa",
+    "3": "Czwartek",
+    "4": "piątek",
+    "5": "sobota",
+    "6": "niedziela"
+  }
+}

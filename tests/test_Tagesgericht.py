@@ -377,50 +377,45 @@ class TestTagesgerichtManager(TestCase):
         self.week = "42"
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_now_datetime", return_value=[2021, 6, 13])
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_init(self, lread_file, get_now_datetime):
+    def test_init(self, get_now_datetime):
         today = date(2021, 6, 13)
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         get_now_datetime.assert_has_calls([call()])
         self.assertEqual(today, cwm.today)
         self.assertEqual(6, cwm.day_num)
         self.assertEqual("23", cwm.current_week)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_now_datetime(self, lread_file):
+    def test_get_now_datetime(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.get_now_datetime()
         now = datetime.now()
         self.assertEqual((now.year, now.month, now.day), result)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.add_week")
     @patch("src.Tagesgericht.TagesgerichtManager.parse_year_dir", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.create_file_structure", return_value=None)
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_init_manager_no_active_days_left(self, lread_file, create_file_structure, parse_year_dir, add_week):
+    def test_init_manager_no_active_days_left(self, create_file_structure, parse_year_dir, add_week):
         add_week.side_effect = [date(2021, 6, 19), date(2021, 6, 25), date(2021, 7, 4)]
         self.active_days = []
         parse_year_dir.return_value = "parsed_data"
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.year, cwm.month, cwm.day = 2021, 6, 13
         cwm.init_manager()
@@ -434,23 +429,21 @@ class TestTagesgerichtManager(TestCase):
         ])
         parse_year_dir.assert_called_once_with(path="unittest")
         self.assertEqual(cwm.data, "parsed_data")
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.add_week")
     @patch("src.Tagesgericht.TagesgerichtManager.parse_year_dir", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.create_file_structure", return_value=None)
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_init_manager_active_days_left(self, lread_file, create_file_structure, parse_year_dir, add_week):
+    def test_init_manager_active_days_left(self, create_file_structure, parse_year_dir, add_week):
         add_week.side_effect = [date(2021, 6, 19), date(2021, 6, 25)]
         self.active_days = [0, 1, 2, 3, 4, 5, 6]
         parse_year_dir.return_value = "parsed_data"
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.year, cwm.month, cwm.day = 2021, 6, 13
         cwm.init_manager()
@@ -464,36 +457,32 @@ class TestTagesgerichtManager(TestCase):
         ])
         parse_year_dir.assert_called_once_with(path="unittest")
         self.assertEqual(cwm.data, "parsed_data")
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_next_weekday(self, lread_file):
+    def test_next_weekday(self):
         today = date(2021, 12, 13)  # monday
         next_monday = date(2021, 12, 20)
         next_friday = date(2021, 12, 17)
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.next_weekday(d=today, weekday=0)
         self.assertEqual(next_monday, result)
         result = cwm.next_weekday(d=today, weekday=4)
         self.assertEqual(next_friday, result)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_add_week(self, lread_file):
+    def test_add_week(self):
         today = date(2021, 12, 13)
         next_week = date(2021, 12, 20)
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.add_week(today=today)
         self.assertEqual(next_week, result)
@@ -501,18 +490,16 @@ class TestTagesgerichtManager(TestCase):
         wednesay = date(2021, 12, 15)
         result = cwm.add_week(today=wednesay)
         self.assertEqual(next_week, result)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_has_active_days_left_this_cw(self, lread_file):
+    def test_has_active_days_left_this_cw(self):
         active_days = [0, 1, 2, 3, 4, 5, 6]
         current_day_num = 3
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         self.assertTrue(cwm.has_active_days_left_this_cw(active_days=active_days, day_num=current_day_num))
         active_days = [0, 1, 2, 3, 6]
@@ -521,21 +508,19 @@ class TestTagesgerichtManager(TestCase):
         self.assertFalse(cwm.has_active_days_left_this_cw(active_days=active_days, day_num=current_day_num))
         active_days = []
         self.assertFalse(cwm.has_active_days_left_this_cw(active_days=active_days, day_num=current_day_num))
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.exists", return_value=False)
     @patch("src.Tagesgericht.makedirs")
     @patch("src.Tagesgericht.TagesgerichtManager.create_templates")
     @patch("src.Tagesgericht.join", side_effect=["unittest/2121", "unittest/2121/42"])
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_create_file_structure(self, lread_file, join, create_templates, makedirs, exists):
+    def test_create_file_structure(self, join, create_templates, makedirs, exists):
         exists.side_effect = [False, False]
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.create_file_structure(data_dir=self.data_dir, year=self.year, week=self.week)
         join.assert_has_calls([
@@ -549,21 +534,19 @@ class TestTagesgerichtManager(TestCase):
         exists.assert_has_calls([
             call("unittest/2121")
         ])
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.exists", return_value=False)
     @patch("src.Tagesgericht.makedirs")
     @patch("src.Tagesgericht.TagesgerichtManager.create_templates")
     @patch("src.Tagesgericht.join", side_effect=["unittest/2121", "unittest/2121/42"])
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_create_file_structure_exists(self, lread_file, join, create_templates, makedirs, exists):
+    def test_create_file_structure_exists(self, join, create_templates, makedirs, exists):
         exists.side_effect = [True, True]
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.create_file_structure(data_dir=self.data_dir, year=self.year, week=self.week)
         join.assert_has_calls([
@@ -575,13 +558,11 @@ class TestTagesgerichtManager(TestCase):
         exists.assert_has_calls([
             call("unittest/2121")
         ])
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join")
     @patch("src.Tagesgericht.isfile")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_create_templates(self, lread_file, isfile, join, lwrite_file):
+    def test_create_templates(self, isfile, join, lwrite_file):
         join.side_effect = [
             "unittest/0_Montag.txt",
             "unittest/1_Dienstag.txt",
@@ -597,11 +578,19 @@ class TestTagesgerichtManager(TestCase):
             True
         ]
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={'weekday_map': {
+                "0": "Montag",
+                "1": "Dienstag",
+                "2": "Mittwoch",
+                "3": "Donnerstag",
+                "4": "Freitag",
+                "5": "Samstag",
+                "6": "Sonntag",
+            }},
+            specialdays={},
+            credentials={}
         )
         cwm.create_templates(active_days=self.active_days, folderpath=self.data_dir)
         join.assert_has_calls([
@@ -622,14 +611,12 @@ class TestTagesgerichtManager(TestCase):
             call(path="unittest/1_Dienstag.txt", data="", json=False),
             call(path="unittest/3_Donnerstag.txt", data="", json=False)
         ])
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join")
     @patch("src.Tagesgericht.isfile")
     @patch("src.Tagesgericht.print")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_create_templates_handles_exception(self, lread_file, lprint, isfile, join, lwrite_file):
+    def test_create_templates_handles_exception(self, lprint, isfile, join, lwrite_file):
         join.side_effect = [
             "unittest/0_Montag.txt",
             "unittest/1_Dienstag.txt",
@@ -646,11 +633,19 @@ class TestTagesgerichtManager(TestCase):
         ]
         lwrite_file.side_effect = Exception("unittest_exception")
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={'weekday_map': {
+                "0": "Montag",
+                "1": "Dienstag",
+                "2": "Mittwoch",
+                "3": "Donnerstag",
+                "4": "Freitag",
+                "5": "Samstag",
+                "6": "Sonntag",
+            }},
+            specialdays={},
+            credentials={}
         )
         cwm.create_templates(active_days=self.active_days, folderpath=self.data_dir)
         lprint.assert_has_calls([
@@ -678,14 +673,12 @@ class TestTagesgerichtManager(TestCase):
             call(path="unittest/3_Donnerstag.txt", data="", json=False)
         ])
         self.assertRaises(Exception)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.parse_week_dir")
     @patch("src.Tagesgericht.join")
     @patch("src.Tagesgericht.listdir")
     @patch("src.Tagesgericht.isdir")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_parse_year_dir(self, lread_file, isdir, listdir, join, parse_week_dir):
+    def test_parse_year_dir(self, isdir, listdir, join, parse_week_dir):
         year = Mock()
         year.endswith.side_effect = [True, False]
         listdir.return_value = ["something.json", "2021"]
@@ -693,11 +686,11 @@ class TestTagesgerichtManager(TestCase):
         join.return_value = "/".join([self.data_dir, "2021"])
         isdir.return_value = True
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.parse_year_dir(path=self.data_dir)
         parse_week_dir.assert_called_once_with(path="unittest/2021", year_dict={}, year="2021")
@@ -705,25 +698,27 @@ class TestTagesgerichtManager(TestCase):
         listdir.called_once_with("unittest")
         isdir.called_once_with("unittest/2021")
         self.assertEqual({"2021": {42: {0: "someday, monday, on calendarweek 42"}}}, result)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_new_calendarweek_obj(self, lread_file):
+    def test_get_new_calendarweek_obj(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.get_new_calendarweek_obj(year="2021", week="42")
         self.assertEqual(Calendarweek(year="2021", week="42"), result)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_new_calendarweek_obj")
-    @patch("src.Tagesgericht.join")
+    @patch("src.Tagesgericht.join", side_effect=[
+        "unittest/2021/42",
+        "unittest/2021/42/log",
+        "unittest/2021/42/0_Montag.txt",
+        "unittest/2021/42/4_Freitag.txt"
+    ])
     @patch("src.Tagesgericht.listdir")
-    @patch("src.Tagesgericht.read_file", side_effect=[{}, {"4": ["logentry1", "logentry2"]}])
+    @patch("src.Tagesgericht.read_file", return_value={"4": ["logentry1", "logentry2"]})
     @patch("src.Tagesgericht.isfile", return_value=True)
     def test_parse_week_dir(self, isfile, lread_file, listdir, join, get_new_calendarweek_obj):
         listdir.side_effect = [
@@ -741,42 +736,40 @@ class TestTagesgerichtManager(TestCase):
         get_new_calendarweek_obj.side_effect = [cw_obj0, ]
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={"13.12": "unittestday"}
+            translation={},
+            specialdays={"13.12": "unittestday"},
+            credentials={}
         )
-        result = cwm.parse_week_dir(year="2021", year_dict={}, path=self.data_dir)
+        result = cwm.parse_week_dir(year="2021", year_dict={}, path="/".join([self.data_dir, "2021"]))
 
         cw_obj0.init_log_for_day.assert_called_once_with(log=["logentry1", "logentry2"], day_num=4)
         get_new_calendarweek_obj.assert_called_once_with(year="2021", week="42")
         listdir.assert_has_calls([
-            call("unittest"),
+            call("unittest/2021"),
             call("unittest/2021/42")
         ])
         lread_file.assert_has_calls([
-            call(path="translate_de.json", json=True),
-            call(path="unittest/2021/42.json", json=True)
+            call(path="unittest/2021/42/log.json", json=True)
         ])
-        isfile.assert_called_once_with(path="unittest/2021/42.json")
+        isfile.assert_called_once_with(path="unittest/2021/42/log.json")
         join.assert_has_calls([
-            call("unittest", "42"),
-            call("unittest", "42", "log"),
-            call("unittest/2021/42", "0_Montag.txt"),
-            call("unittest/2021/42", "4_Freitag.txt")
+            call('unittest/2021', '42'),
+            call('unittest/2021', '42', 'log'),
+            call('unittest/2021/42', '0_Montag.txt'),
+            call('unittest/2021/42', '4_Freitag.txt')
         ])
         self.assertEqual({"42": cw_obj0}, result)
 
     @patch("src.Tagesgericht.print")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_print_data(self, lread_file, lprint):
+    def test_print_data(self, lprint):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         ci0 = Mock()
         ci0.message_length = 13
@@ -825,57 +818,57 @@ class TestTagesgerichtManager(TestCase):
             call("unittest/unit.txt", "❎", "", "message empty"),
             call("unittest/unit.txt", "❌️", "", "message too long")
         ])
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_rst_line_for_str(self, lread_file):
+    def test_get_rst_line_for_str(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         line = cwm.get_rst_line_for_str(string="123456789", linetype="*")
         self.assertEqual("**********", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_formatted_rst_header(self, lread_file):
+    def test_get_formatted_rst_header(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         line = cwm.get_formatted_rst_header(message="123456789", linetype="*", doubled=False)
         self.assertEqual("123456789\n**********\n\n", line)
         line = cwm.get_formatted_rst_header(message="123456789", linetype="*", doubled=True)
         self.assertEqual("**********\n123456789\n**********\n\n", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_formatted_rst_quote(self, lread_file):
+    def test_get_formatted_rst_quote(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         line = cwm.get_formatted_rst_quote(message="123456789", quote="quote")
         self.assertEqual(":quote:\n\n    123456789\n\n", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_return_week_as_rst_string(self, lread_file):
+    def test_return_week_as_rst_string(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={'weekday_map': {
+                "0": "Montag",
+                "1": "Dienstag",
+                "2": "Mittwoch",
+                "3": "Donnerstag",
+                "4": "Freitag",
+                "5": "Samstag",
+                "6": "Sonntag",
+            }},
+            specialdays={},
+            credentials={}
         )
         ci0 = Mock()
         ci0.message_length = 13
@@ -926,20 +919,18 @@ class TestTagesgerichtManager(TestCase):
                          "Mittwoch, 15.12.2021 ❌️\n^^^^^^^^^^^^^^^^^^^^^^^^\n\n" + ":Info:\n\n    Unittest tag\n\n" +
                          ":Error:\n\n    message too long\n\n" +
                          "::\n\n    message test unittest 3\n\n", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_formatted_rst_header")
     @patch("src.Tagesgericht.TagesgerichtManager.get_formatted_rst_quote")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_report_legend_report(self, lread_file, get_formatted_rst_quote, get_formatted_rst_header):
+    def test_get_report_legend_report(self, get_formatted_rst_quote, get_formatted_rst_header):
         get_formatted_rst_header.return_value = "unittest_header\n"
         get_formatted_rst_quote.return_value = "unittest_quote"
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         line = cwm.get_report_legend(header="unittest", history=False)
         get_formatted_rst_header.assert_called_once_with(
@@ -954,20 +945,18 @@ class TestTagesgerichtManager(TestCase):
                     ":❌: Planned message cant be sent"
         )
         self.assertEqual("unittest_header\nunittest_quote", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_formatted_rst_header")
     @patch("src.Tagesgericht.TagesgerichtManager.get_formatted_rst_quote")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_report_legend_history(self, lread_file, get_formatted_rst_quote, get_formatted_rst_header):
+    def test_get_report_legend_history(self, get_formatted_rst_quote, get_formatted_rst_header):
         get_formatted_rst_header.return_value = "unittest_header\n"
         get_formatted_rst_quote.return_value = "unittest_quote"
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         line = cwm.get_report_legend(header="unittest", history=True)
         get_formatted_rst_header.assert_called_once_with(
@@ -982,16 +971,13 @@ class TestTagesgerichtManager(TestCase):
                     ":❌: Message was not sent"
         )
         self.assertEqual("unittest_header\nunittest_quote", line)
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.remove_folder")
     @patch("src.Tagesgericht.create_folder")
     @patch("src.Tagesgericht.TagesgerichtManager.get_report_legend")
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.TagesgerichtManager.return_week_as_rst_string")
-    @patch("src.Tagesgericht.read_file", return_value={})
     def test_create_rst_data(self,
-                             lread_file,
                              return_week_as_rst_string,
                              lwrite_file,
                              get_report_legend,
@@ -1065,11 +1051,11 @@ class TestTagesgerichtManager(TestCase):
         }
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.report_build_folder = "unittest"
         cwm.data = {"2021": {"49": cw_obj, "50": cw_obj1}}
@@ -1101,12 +1087,10 @@ class TestTagesgerichtManager(TestCase):
         ])
         lcreate_folder.assert_called_once_with(dir_path="unittest")
         lremove_folder.assert_called_once_with(dir_path="unittest")
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.join", return_value="unittest/log.json")
     @patch("src.Tagesgericht.write_file")
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_write_week_logfile(self, lread_file, lwrite_file, ljoin):
+    def test_write_week_logfile(self, lwrite_file, ljoin):
         day_0 = Mock()
         day_0.logentrys = ["unittest logentry"]
         day_1 = Mock()
@@ -1117,11 +1101,11 @@ class TestTagesgerichtManager(TestCase):
             "1": day_1,
         }
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
 
         cwm.year, cwm.month, cwm.day = 2021, 12, 13
@@ -1129,15 +1113,13 @@ class TestTagesgerichtManager(TestCase):
         cwm.write_week_logfile(week="42", items=items)
         lwrite_file.assert_called_once_with(path="unittest/log.json", json=True, data={"0": ["unittest logentry"]})
         ljoin.assert_called_once_with("unittest", "2021", "42", "log.json")
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join", return_value="unittest/2021/6/log.json")
-    def test_send_message_for_today(self, ljoin, lwrite_file, get_current_week_obj, lread_file, init_manager,
+    def test_send_message_for_today(self, ljoin, lwrite_file, get_current_week_obj, init_manager,
                                     get_today_from_calendarweek):
         today_obj = get_today_from_calendarweek.return_value
         today_obj.has_been_sent.return_value = False
@@ -1150,26 +1132,24 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = today_obj
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.send_message_for_today()
         ljoin.assert_called_once_with("unittest", "2021", "42", "log.json")
         lwrite_file.assert_called_once_with(path="unittest/2021/6/log.json", json=True, data={})
         init_manager.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join", return_value="unittest/2021/6/log.json")
-    def test_send_message_for_today_not_sendable(self, ljoin, lwrite_file, get_current_week_obj, lread_file,
+    def test_send_message_for_today_not_sendable(self, ljoin, lwrite_file, get_current_week_obj,
                                                  init_manager, get_today_from_calendarweek):
         today_obj = get_today_from_calendarweek.return_value
         today_obj.has_been_sent.return_value = False
@@ -1182,11 +1162,11 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = today_obj
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1194,15 +1174,13 @@ class TestTagesgerichtManager(TestCase):
         lwrite_file.assert_called_once_with(path="unittest/2021/6/log.json", json=True, data={})
         init_manager.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join", return_value="unittest/2021/6/log.json")
-    def test_send_message_for_today_has_been_sent(self, ljoin, lwrite_file, get_current_week_obj, lread_file,
+    def test_send_message_for_today_has_been_sent(self, ljoin, lwrite_file, get_current_week_obj,
                                                   init_manager, get_today_from_calendarweek):
         today_obj = get_today_from_calendarweek.return_value
         today_obj.has_been_sent.return_value = True
@@ -1215,11 +1193,11 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = today_obj
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1227,23 +1205,21 @@ class TestTagesgerichtManager(TestCase):
         lwrite_file.assert_not_called()
         init_manager.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.write_file")
     @patch("src.Tagesgericht.join", return_value="unittest/2021/6/log.json")
-    def test_send_message_for_today_no_obj(self, ljoin, lwrite_file, lread_file, init_manager,
+    def test_send_message_for_today_no_obj(self, ljoin, lwrite_file, init_manager,
                                            get_today_from_calendarweek):
         get_today_from_calendarweek.return_value = None
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.send_message_for_today()
         self.assertEqual(False, result)
@@ -1251,18 +1227,16 @@ class TestTagesgerichtManager(TestCase):
         lwrite_file.assert_not_called()
         init_manager.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
-    def test_get_today_from_calendarweek(self, get_current_week_obj, init_manager, lread_file):
+    def test_get_today_from_calendarweek(self, get_current_week_obj, init_manager):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.year = 2021
         cwm.current_week = 42
@@ -1280,17 +1254,15 @@ class TestTagesgerichtManager(TestCase):
         result = cwm.get_today_from_calendarweek()
         init_manager.assert_has_calls([""])
         get_current_week_obj.assert_has_calls([""])
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertEqual("unittest", result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
-    def test_get_current_week_obj(self, lread_file):
+    def test_get_current_week_obj(self):
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.year = 2021
         cwm.current_week = 42
@@ -1302,12 +1274,10 @@ class TestTagesgerichtManager(TestCase):
             }
         }
         result = cwm.get_current_week_obj()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertEqual(cw_obj, result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_send_message_all_false(self, get_today_from_calendarweek, lread_file):
+    def test_show_send_message_all_false(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = False
         current_day_obj_mock.has_been_stopped.return_value = False
@@ -1315,21 +1285,19 @@ class TestTagesgerichtManager(TestCase):
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_send_message_sendable(self, get_today_from_calendarweek, lread_file):
+    def test_show_send_message_sendable(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = False
         current_day_obj_mock.has_been_stopped.return_value = False
@@ -1337,21 +1305,19 @@ class TestTagesgerichtManager(TestCase):
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertTrue(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_send_message_already_sent(self, get_today_from_calendarweek, lread_file):
+    def test_show_send_message_already_sent(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = True
         current_day_obj_mock.has_been_stopped.return_value = False
@@ -1359,21 +1325,19 @@ class TestTagesgerichtManager(TestCase):
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_send_message_already_has_bee_stopped(self, get_today_from_calendarweek, lread_file):
+    def test_show_send_message_already_has_bee_stopped(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = True
         current_day_obj_mock.has_been_stopped.return_value = True
@@ -1381,88 +1345,80 @@ class TestTagesgerichtManager(TestCase):
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_send_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_sold_out_message_all_false(self, get_today_from_calendarweek, lread_file):
+    def test_show_sold_out_message_all_false(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = False
         current_day_obj_mock.has_been_stopped.return_value = False
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_sold_out_message_show(self, get_today_from_calendarweek, lread_file):
+    def test_show_sold_out_message_show(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = True
         current_day_obj_mock.has_been_stopped.return_value = False
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertTrue(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
-    def test_show_sold_out_message_already_stopped(self, get_today_from_calendarweek, lread_file):
+    def test_show_sold_out_message_already_stopped(self, get_today_from_calendarweek):
         current_day_obj_mock = Mock()
         current_day_obj_mock.has_been_sent.return_value = True
         current_day_obj_mock.has_been_stopped.return_value = True
         get_today_from_calendarweek.return_value = current_day_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         result = cwm.show_sold_out_message()
         current_day_obj_mock.has_been_sent.assert_called_once_with(translate={})
         get_today_from_calendarweek.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     def test_send_sold_out_message(self, get_today_from_calendarweek, write_week_logfile, get_current_week_obj,
-                                   init_manager, lread_file):
+                                   init_manager):
         current_week_obj_mock = Mock()
         mock_day = Mock()
         mock_day.has_been_sent.return_value = True
@@ -1476,11 +1432,11 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = current_week_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.day_num = 0
         cwm.current_week = "42"
@@ -1493,16 +1449,14 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.assert_called_once_with()
         get_today_from_calendarweek.assert_called_once_with()
         init_manager.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertTrue(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     def test_send_sold_out_message_not_sent_yet(self, get_today_from_calendarweek, write_week_logfile,
-                                                get_current_week_obj, init_manager, lread_file):
+                                                get_current_week_obj, init_manager):
         current_week_obj_mock = Mock()
         mock_day = Mock()
         mock_day.has_been_sent.return_value = False
@@ -1516,11 +1470,11 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = current_week_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.day_num = 0
         cwm.current_week = "42"
@@ -1530,16 +1484,14 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.assert_not_called()
         get_today_from_calendarweek.assert_called_once_with()
         init_manager.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)
 
-    @patch("src.Tagesgericht.read_file", return_value={})
     @patch("src.Tagesgericht.TagesgerichtManager.init_manager")
     @patch("src.Tagesgericht.TagesgerichtManager.get_current_week_obj")
     @patch("src.Tagesgericht.TagesgerichtManager.write_week_logfile")
     @patch("src.Tagesgericht.TagesgerichtManager.get_today_from_calendarweek")
     def test_send_sold_out_message_already_sent(self, get_today_from_calendarweek, write_week_logfile,
-                                                get_current_week_obj, init_manager, lread_file):
+                                                get_current_week_obj, init_manager):
         current_week_obj_mock = Mock()
         mock_day = Mock()
         mock_day.has_been_sent.return_value = True
@@ -1553,11 +1505,11 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.return_value = current_week_obj_mock
 
         cwm = TagesgerichtManager(
-            weekday_map=self.weekday_map,
             active_days=self.active_days,
             data_dir=self.data_dir,
-            language="de",
-            specialdays={}
+            translation={},
+            specialdays={},
+            credentials={}
         )
         cwm.day_num = 0
         cwm.current_week = "42"
@@ -1567,5 +1519,4 @@ class TestTagesgerichtManager(TestCase):
         get_current_week_obj.assert_not_called()
         get_today_from_calendarweek.assert_called_once_with()
         init_manager.assert_called_once_with()
-        lread_file.assert_called_once_with(path="translate_de.json", json=True)
         self.assertFalse(result)

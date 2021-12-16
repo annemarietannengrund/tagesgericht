@@ -1,0 +1,33 @@
+{
+  "calendarweek": "Календарна седмица",
+  "status": "статус",
+  "couldnt create file, check permissions": "не можах да създадем файл, моля, проверете разрешенията",
+  "message empty": "Съобщението е празно",
+  "message too long": "Съобщението е твърде дълго",
+  "Future & Active calendar weeks": "Активни и бъдещи календарни седмици",
+  "Past calendar weeks": "Минали календарни седмици",
+  "Error": "грешка",
+  "Info": "информация",
+  "Planned message can be sent": "може да бъде изпратено насрочено съобщение",
+  "Planned message is empty": "насроченото съобщение е празно",
+  "Planned message cant be sent": "Насроченото съобщение не може да бъде изпратено",
+  "Legend": "Обяснение",
+  "Message was sent": "съобщението е изпратено",
+  "Message was not sent": "съобщението не е изпратено",
+  "sent at": "публикувано на",
+  "exit program": "програма за излизане",
+  "create report": "Създаване на отчет",
+  "stopped at": "Спря на",
+  "unsent": "Неизпратено",
+  "Tweet was not sent, please see report for reason": "Съобщението не беше изпратено, моля, вижте отчета за причината",
+  "you can close this window now": "Вече можете да затворите прозореца!",
+  "weekday_map": {
+    "0": "понеделник",
+    "1": "вторник",
+    "2": "сряда",
+    "3": "четвъртък",
+    "4": "петък",
+    "5": "събота",
+    "6": "неделя"
+  }
+}

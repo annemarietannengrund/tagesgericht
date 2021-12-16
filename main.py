@@ -1,34 +1,26 @@
 from sys import argv
 
-from simple_term_menu import TerminalMenu
-
 from src.Tagesgericht import TagesgerichtManager, read_file
 
 
-def bat_handler(arg: str, lconfig: dict):
-    TM = TagesgerichtManager(
-        weekday_map=lconfig.get('weekday_map'),
-        active_days=lconfig.get('active_days'),
-        data_dir=lconfig.get('data_dir'),
-        language="de",
-        specialdays=lconfig.get('specialdays'),
-    )
-    if arg == 'print_report':
-        TM.init_manager()
-        TM.print_data()
-    elif arg == 'create_report':
-        TM.init_manager()
-        TM.create_rst_data()
-    elif arg == 'send_tweet':
-        result = TM.send_message_for_today()
+def bat_handler(larg: str, lconfig: dict):
+    tm = config['TagesgerichtManager']
+    if larg == 'print_report':
+        tm.init_manager()
+        tm.print_data()
+    elif larg == 'create_report':
+        tm.init_manager()
+        tm.create_rst_data()
+    elif larg == 'send_tweet':
+        result = tm.send_message_for_today()
         if not result:
             print(lconfig.get('translate', {}).get("Tweet was not sent, please see report for reason",
                                                    "Tweet was not sent, please see report for reason"))
             print(lconfig.get('translate', {}).get("you can close this window now"))
         else:
             print(result)
-    elif arg == 'stop_tweet':
-        result = TM.send_sold_out_message()
+    elif larg == 'stop_tweet':
+        result = tm.send_sold_out_message()
         if not result:
             print(lconfig.get('translate', {}).get("Tweet was not sent, please see report for reason",
                                                    "Tweet was not sent, please see report for reason"))
@@ -36,7 +28,7 @@ def bat_handler(arg: str, lconfig: dict):
         else:
             print(result)
     else:
-        print('commend unknown', arg)
+        print('commend unknown', larg)
 
 
 def create_report(lconfig: dict):
@@ -76,17 +68,23 @@ def get_options(lconfig: dict):
     return options
 
 
+def load_language(code: str) -> dict:
+    return read_file('languages/{}.json'.format(code), json=True)
+
+
+def load_credentials() -> dict:
+    return read_file('credentials.json', json=True)
+
+
+def load_specialdays() -> dict:
+    return read_file('specialdays.json', json=True)
+
+
 def main(lconfig: dict):
-    lconfig['TagesgerichtManager'] = TagesgerichtManager(
-        weekday_map=config.get('weekday_map'),
-        active_days=config.get('active_days'),
-        data_dir=config.get('data_dir'),
-        language="de",
-        specialdays=config.get('specialdays'),
-    )
+    from simple_term_menu import TerminalMenu
 
     while True:
-        options = get_options(lconfig=config)
+        options = get_options(lconfig=lconfig)
         terminal_menu = TerminalMenu(list(options.keys()))
         menu_entry_index = terminal_menu.show()
         if not menu_entry_index and menu_entry_index != 0:
@@ -95,37 +93,27 @@ def main(lconfig: dict):
 
 
 if __name__ == '__main__':
-    credentials = read_file('credentials.json', json=True)
     config = {
-        "credentials": {
-            "API_KEY": credentials.get('API_KEY', ''),
-            "API_KEY_SECRET": credentials.get('API_KEY_SECRET', ''),
-            "BEARER_TOKEN": credentials.get('BEARER_TOKEN', ''),
-            "ACCESS_TOKEN": credentials.get('ACCESS_TOKEN', ''),
-            "ACCESS_TOKEN_SECRET": credentials.get('ACCESS_TOKEN_SECRET', ''),
-        },
-        "specialdays": read_file(path="specialdays.json", json=True),
+        "credentials": load_credentials(),
+        "specialdays": load_specialdays(),
+        'translate': load_language(code='de'),
         "data_dir": "Data/",
         "active_days": [0, 1, 2, 3, 4],
-        'weekday_map': {
-            0: 'Montag',
-            1: 'Dienstag',
-            2: 'Mittwoch',
-            3: 'Donnerstag',
-            4: 'Freitag',
-            5: 'Samstag',
-            6: 'Sonntag',
-        },
-        'translate': {
-            "exit program": "Programm beenden",
-            "create report": "Report erstellen",
-            "Tweet was not sent, please see report for reason": "Tweet wurde nicht gesendet, bitte report einsehen für grund",
-            "you can close this window now": "Sie können das Fenster nun schließen!"
-        }
     }
+
+    config['TagesgerichtManager'] = TagesgerichtManager(
+        active_days=config.get('active_days', []),
+        data_dir=config.get('data_dir', 'Data'),
+        translation=config.get('translate', {}),
+        specialdays=config.get('specialdays', {}),
+        credentials=config.get('credentials', {}),
+    )
+
+    # if main.py has been called with argument
     if argv[1:]:
         for arg in argv[1:]:
-            bat_handler(arg=arg, lconfig=config)
+            bat_handler(larg=arg, lconfig=config)
         exit(0)
+    # else it launches terminal menu
     main(lconfig=config)
     exit(0)

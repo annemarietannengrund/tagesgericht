@@ -158,11 +158,11 @@ class Calendarweek:
         self.week_icon = week_status
 
     @staticmethod
-    def get_cw_from_to(year: str, week: str) -> [date, date]:
+    def get_cw_from_to(year: str, week: str) -> List[date]:
         """Calculates the start and endday of a calendarweek only given a year and a weeknumber"""
         first_day_of_week = datetime.strptime(f"{year}-W{week}-1", "%Y-W%W-%w").date()
         last_day_of_week = first_day_of_week + timedelta(days=6.9)
-        return first_day_of_week, last_day_of_week
+        return [first_day_of_week, last_day_of_week]
 
     @staticmethod
     def get_real_date_by_year_cw_day(year: str, week: str, day: int) -> date:
@@ -211,23 +211,24 @@ class TagesgerichtManager:
     today: date
 
     def __init__(self,
-                 weekday_map: dict,
                  active_days: List[int],
                  data_dir: str,
-                 language: str,
-                 specialdays: dict
+                 translation: dict,
+                 specialdays: dict,
+                 credentials: dict
                  ):
-        self.weekday_map = weekday_map
+        self.weekday_map = translation.get('weekday_map', {})
         self.active_days = active_days
         self.specialdays = specialdays
+        self.credentials = credentials
         self.data_dir = data_dir
         self.year, self.month, self.day = self.get_now_datetime()
         self.today = date(self.year, self.month, self.day)
         self.day_num = self.today.weekday()
         self.current_week = str(self.today.isocalendar()[1])
-        self.report_build_folder = "Sphinx-docs/reportz"
+        self.report_build_folder = "Sphinx-docs/report"
         self.data = {}
-        self.translate = read_file(path="translate_{}.json".format(language), json=True)
+        self.translate = translation
 
     def get_today_from_calendarweek(self) -> Union[Calendaritem, bool]:
         """Returns current Calendaritem day from the Calendarweek"""
@@ -366,7 +367,7 @@ class TagesgerichtManager:
     def create_templates(self, active_days: list, folderpath: str) -> None:
         """creates the empty daytemplates within the calendarweeksfolder"""
         for day_num in active_days:
-            day_name = self.weekday_map.get(day_num)
+            day_name = self.weekday_map.get(str(day_num))
             filename = "{}_{}.txt".format(day_num, day_name)
             filepath = join(folderpath, filename)
             filepath = str(filepath)
@@ -403,8 +404,10 @@ class TagesgerichtManager:
             cw_files_dirpath = str(join(path, week))
             cw_logfile_dirpath = str(join(path, week, "log")) + ".json"
             day_logfiles = {}
+
             if isfile(path=cw_logfile_dirpath):
                 day_logfiles = read_file(path=cw_logfile_dirpath, json=True)
+
             cw_obj = self.get_new_calendarweek_obj(year=year, week=week)
             for message_file in listdir(cw_files_dirpath):
                 if message_file.endswith("log.json"):
@@ -503,7 +506,7 @@ class TagesgerichtManager:
         week_header = "{} {} {}".format(self.translate.get("calendarweek", "calendarweek"), week.week, week.week_icon)
         ret = self.get_formatted_rst_header(message=week_header, doubled=True, linetype="=")
         for day_num, day_data in OrderedDict(sorted(week.items.items())).items():
-            day_header = "{}, {} {}".format(self.weekday_map.get(day_num), day_data.item_date.strftime("%d.%m.%Y"),
+            day_header = "{}, {} {}".format(self.weekday_map.get(str(day_num)), day_data.item_date.strftime("%d.%m.%Y"),
                                             day_data.message_icon)
             ret += self.get_formatted_rst_header(message=day_header, doubled=False, linetype="^")
             if day_data.specialday:
