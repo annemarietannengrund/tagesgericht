@@ -1,6 +1,40 @@
 from simple_term_menu import TerminalMenu
-from os.path import isfile
+from sys import argv
 from src.Tagesgericht import TagesgerichtManager, read_file
+
+
+def bat_handler(arg: str, lconfig: dict):
+    TM = TagesgerichtManager(
+        weekday_map=lconfig.get('weekday_map'),
+        active_days=lconfig.get('active_days'),
+        data_dir=lconfig.get('data_dir'),
+        language="de",
+        specialdays=lconfig.get('specialdays'),
+    )
+    if arg == 'print_report':
+        TM.init_manager()
+        TM.print_data()
+    elif arg == 'create_report':
+        TM.init_manager()
+        TM.create_rst_data()
+    elif arg == 'send_tweet':
+        result = TM.send_message_for_today()
+        if not result:
+            print(lconfig.get('translate', {}).get("Tweet was not sent, please see report for reason",
+                                                   "Tweet was not sent, please see report for reason"))
+            print(lconfig.get('translate', {}).get("you can close this window now"))
+        else:
+            print(result)
+    elif arg == 'stop_tweet':
+        result = TM.send_sold_out_message()
+        if not result:
+            print(lconfig.get('translate', {}).get("Tweet was not sent, please see report for reason",
+                                                   "Tweet was not sent, please see report for reason"))
+            print(lconfig.get('translate', {}).get("you can close this window now"))
+        else:
+            print(result)
+    else:
+        print('commend unknown', arg)
 
 def create_report(lconfig: dict):
     cwm = lconfig.get('TagesgerichtManager')
@@ -49,7 +83,6 @@ def main(lconfig: dict):
     )
 
     while True:
-
         options = get_options(lconfig=config)
         terminal_menu = TerminalMenu(list(options.keys()))
         menu_entry_index = terminal_menu.show()
@@ -83,6 +116,13 @@ if __name__ == '__main__':
         'translate': {
             "exit program": "Programm beenden",
             "create report": "Report erstellen",
+            "Tweet was not sent, please see report for reason": "Tweet wurde nicht gesendet, bitte report einsehen für grund",
+            "you can close this window now": "Sie können das Fenster nun schließen!"
         }
     }
+    if argv[1:]:
+        for arg in argv[1:]:
+            bat_handler(arg=arg, lconfig=config)
+        exit(0)
     main(lconfig=config)
+    exit(0)

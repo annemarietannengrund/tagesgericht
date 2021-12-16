@@ -14,9 +14,13 @@ setup.bat - prepare the virtual environment for this software
 use the batchfiles.
 
 create_html_report.bat - creates a html report and opens it in the browser
+
 create_sphinx_report.bat - creates html report (internally used, nnot intended for you)
+
 send_tagesgericht_tweet.bat - sends the prepared message for the day
+
 stop_tagesgericht_tweet.bat - sends a sold-out message
+
 check_code_coverage - creates a html code coverage ceport
 
 # run on linux/mac
@@ -31,8 +35,8 @@ chmod +x *.sh
 ```
 or
 ```
-python bat_handler.py print_report
-python bat_handler.py create_report
-python bat_handler.py send_tweet
-python bat_handler.py stoptweet
+python main.py print_report
+python main.py create_report
+python main.py send_tweet
+python main.py stoptweet
 ```

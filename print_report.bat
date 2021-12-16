@@ -1,2 +1,2 @@
-%cd%\tagesgericht-venv\Scripts\python.exe "%cd%\bat_handler.py" "print_report"
+%cd%\tagesgericht-venv\Scripts\python.exe "%cd%\main.py" "print_report"
 pause
