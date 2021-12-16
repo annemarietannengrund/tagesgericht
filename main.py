@@ -1,5 +1,7 @@
-from simple_term_menu import TerminalMenu
 from sys import argv
+
+from simple_term_menu import TerminalMenu
+
 from src.Tagesgericht import TagesgerichtManager, read_file
 
 
@@ -35,6 +37,7 @@ def bat_handler(arg: str, lconfig: dict):
             print(result)
     else:
         print('commend unknown', arg)
+
 
 def create_report(lconfig: dict):
     cwm = lconfig.get('TagesgerichtManager')

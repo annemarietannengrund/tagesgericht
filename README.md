@@ -7,6 +7,7 @@ install [python 3.7+](https://www.python.org/downloads/), make sure to check "ad
 also allow max pathlengths to be exceeded, at the end of the installer
 
 then start the following bat file
+
 setup.bat - prepare the virtual environment for this software
 
 # run on windows
@@ -24,16 +25,21 @@ stop_tagesgericht_tweet.bat - sends a sold-out message
 check_code_coverage - creates a html code coverage ceport
 
 # run on linux/mac
+
 ```
 coverage run -m unittest discover -s ./tests && coverage html
 coverage run -m unittest discover ./tests --ignore=Sphinx-docs && coverage html
 ```
+
 or
+
 ```
 chmod +x *.sh
 ./tagesgericht.sh
 ```
+
 or
+
 ```
 python main.py print_report
 python main.py create_report
