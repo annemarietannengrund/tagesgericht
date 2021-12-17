@@ -160,3 +160,4 @@ python main.py stoptweet
 ## tips & tricks
 - since the storage is based on text files in folders, its easy to prepare things on one device and import them on another.
 - the bat files can just be linked to a location, for easy access. (rightclick -> send to desktop)
+- windows has a built in emoji keyboard win+.

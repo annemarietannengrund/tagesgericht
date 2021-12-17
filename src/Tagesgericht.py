@@ -20,13 +20,14 @@ def twitter_call(message: str, credentials: dict):
     access_key = credentials.get("ACCESS_TOKEN", "")
     access_secret = credentials.get("ACCESS_TOKEN_SECRET", "")
     encoding = credentials.get('ENCODING', "utf-8")
-    username = ""
-    statustext = ""
+    latitude = credentials.get('LATITUDE', "utf-8")
+    longitude = credentials.get('LONGITUDE', "utf-8")
+    display_coordinates = latitude and longitude
     api = Api(consumer_key=consumer_key, consumer_secret=consumer_secret,
               access_token_key=access_key, access_token_secret=access_secret,
               input_encoding=encoding, request_headers=None)
     try:
-        status = api.PostUpdate(message)
+        status = api.PostUpdate(message, latitude=latitude, longitude=longitude, display_coordinates=display_coordinates)
         print("{0} just posted: {1}".format(status.user.name, status.text))
     except UnicodeDecodeError:
         print("whoopsie")
